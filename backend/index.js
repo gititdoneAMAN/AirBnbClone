@@ -27,7 +27,7 @@ app.post("/login", async (req, res) => {
       if (isMatch) {
         jwt.sign(username, process.env.JWT_SECRET, (err, token) => {
           if (err) throw err;
-          res.json({ msg: "login success", token });
+          res.json({ msg: "login success", token, user: user });
         });
       } else {
         console.log("Password is wrong ");
@@ -52,6 +52,19 @@ app.post("/register", async (req, res) => {
     res.json({ msg: "register success" });
   } else {
     res.json({ msg: "register failed" });
+  }
+});
+
+app.post("/profile", async (req, res) => {
+  const { token } = req.body;
+  try {
+    const username = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(username);
+    const user = await User.findOne({ username });
+    console.log(user);
+    res.json({ user: user });
+  } catch (err) {
+    res.json({ msg: "Error in the profile route" });
   }
 });
 

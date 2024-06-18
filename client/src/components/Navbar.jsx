@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { userContext } from "../UserContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
+
+  const { loggedIn, setLoggedIn } = useContext(userContext);
 
   return (
     <header className="p-4 ">
@@ -72,6 +75,13 @@ const Navbar = () => {
               />
             </svg>
           </div>
+          {loggedIn ? (
+            <div className="font-semibold text-[18px] text-center flex justify-center items-center pb-1">
+              {loggedIn.fullname}
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </nav>
     </header>

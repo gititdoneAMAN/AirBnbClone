@@ -5,18 +5,21 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import axios from "axios";
+import UserContextProvider from "./UserContext";
 
 axios.defaults.baseURL = "http://localhost:3000";
 
 function App() {
   return (
     <div>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+      <UserContextProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </UserContextProvider>
     </div>
   );
 }
