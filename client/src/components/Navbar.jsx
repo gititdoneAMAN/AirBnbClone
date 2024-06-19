@@ -33,7 +33,7 @@ const Navbar = () => {
           <span className="font-bold text-[30px]">airbnb</span>
         </div>
 
-        <div className="flex gap-4 bg-white border border-black rounded-full px-3 pt-2 pb-3 shadow-md">
+        <div className="flex gap-4 bg-white  rounded-full px-3 pt-2 pb-3 shadow-md">
           <span className="cursor-pointer">Anywhere</span>
           <span>|</span>
           <span className="cursor-pointer">Anyweek</span>
@@ -41,7 +41,7 @@ const Navbar = () => {
           <span className="cursor-pointer">Add Guests</span>
         </div>
 
-        <div className="bg-white flex gap-2 items-center border border-black rounded-full px-2 pt-1 pb-1 shadow-md cursor-pointer">
+        <div className="bg-white flex gap-2 items-center rounded-full px-2 pt-1 pb-1 shadow-md cursor-pointer">
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +66,7 @@ const Navbar = () => {
               stroke-width="1.5"
               stroke="currentColor"
               class="size-9"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate(loggedIn ? "/account" : "/login")}
             >
               <path
                 stroke-linecap="round"
@@ -80,7 +80,7 @@ const Navbar = () => {
               {loggedIn.fullname}
             </div>
           ) : (
-            <></>
+            <div></div>
           )}
         </div>
       </nav>

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import axios from "axios";
 import UserContextProvider from "./UserContext";
+import Account from "./pages/Account";
 
 axios.defaults.baseURL = "http://localhost:3000";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/account/:subPage?" element={<Account />} />
         </Routes>
       </UserContextProvider>
     </div>
