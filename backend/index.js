@@ -1,13 +1,19 @@
 const express = require("express");
-const { loginSchema, registerSchema } = require("./types");
+const { loginSchema, registerSchema, placesSchema } = require("./types");
 const cors = require("cors");
-const { User } = require("./db");
+const { User, Place } = require("./db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const download = require("image-downloader");
+const multer = require("multer");
+const fs = require("fs");
+
+const { verifyToken } = require("./middleware");
 
 const app = express();
 require("dotenv").config();
 
+app.use("/uploads", express.static(__dirname + `\\uploads`));
 app.use(express.json());
 app.use(cors());
 
@@ -25,10 +31,14 @@ app.post("/login", async (req, res) => {
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
-        jwt.sign(username, process.env.JWT_SECRET, (err, token) => {
-          if (err) throw err;
-          res.json({ msg: "login success", token, user: user });
-        });
+        jwt.sign(
+          { username, id: user._id },
+          process.env.JWT_SECRET,
+          (err, token) => {
+            if (err) throw err;
+            res.json({ msg: "login success", token, user: user });
+          }
+        );
       } else {
         console.log("Password is wrong ");
         res.status(401).json({ msg: "login failed" });
@@ -58,7 +68,7 @@ app.post("/register", async (req, res) => {
 app.post("/profile", async (req, res) => {
   const { token } = req.body;
   try {
-    const username = jwt.verify(token, process.env.JWT_SECRET);
+    const { username } = jwt.verify(token, process.env.JWT_SECRET);
     console.log(username);
     const user = await User.findOne({ username });
     console.log(user);
@@ -66,6 +76,100 @@ app.post("/profile", async (req, res) => {
   } catch (err) {
     res.json({ msg: "Error in the profile route" });
   }
+});
+
+app.post("/uploadImage", (req, res) => {
+  try {
+    const { link } = req.body;
+
+    console.log(link);
+    console.log(__dirname);
+
+    const newLink = "photo" + Date.now() + ".jpg";
+    console.log(newLink);
+    download
+      .image({
+        url: link,
+        dest: __dirname + `\\uploads\\` + newLink,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        },
+      })
+      .then(() => {
+        res.json({
+          msg: "image uploaded",
+          filename: newLink,
+        });
+      });
+  } catch (err) {
+    console.log("Error in the upload image route", err);
+    res.json({ msg: "Error in the upload image route" });
+  }
+});
+
+const photoMiddleware = multer({ dest: "uploads/" });
+
+app.post("/upload", photoMiddleware.array("photos", 100), (req, res) => {
+  const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i];
+    const data = originalname.split(".");
+    const ext = data[data.length - 1];
+    const newPath = path + "." + ext;
+    fs.renameSync(path, newPath);
+    uploadedFiles.push(newPath.replace("uploads\\", ""));
+  }
+  res.json(uploadedFiles);
+});
+
+app.post("/places", verifyToken, async (req, res) => {
+  const payload = req.body;
+
+  console.log(payload);
+
+  const parsedPayload = placesSchema.safeParse(payload);
+
+  console.log(parsedPayload);
+
+  if (parsedPayload.success) {
+    const {
+      title,
+      address,
+      addedPhotos,
+      description,
+      perks,
+      extraInfo,
+      checkIn,
+      checkout,
+      maxGuests,
+    } = parsedPayload.data;
+
+    const newPlace = {
+      title,
+      address,
+      addedPhotos,
+      description,
+      perks,
+      extraInfo,
+      checkIn,
+      checkout,
+      maxGuests,
+      owner: req.id,
+    };
+    const data = await Place.create(newPlace);
+    console.log("------------------------------");
+    console.log(data);
+    res.json({ msg: "places added" });
+  } else {
+    res.json({ msg: "places not added" });
+  }
+});
+
+app.get("/userPlacesData", verifyToken, async (req, res) => {
+  console.log(req.id);
+  const data = await Place.find({ owner: req.id });
+  res.json({ userData: data });
 });
 
 app.listen(3000, () => {

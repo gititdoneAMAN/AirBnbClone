@@ -19,8 +19,26 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+const placeSchema = new mongoose.Schema({
+  title: String,
+  address: String,
+  addedPhotos: [String],
+  description: String,
+  perks: [String],
+  extraInfo: String,
+  checkIn: String,
+  checkout: String,
+  maxGuests: Number,
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+});
+
 const User = mongoose.model("User", userSchema);
+const Place = mongoose.model("Place", placeSchema);
 
 module.exports = {
   User,
+  Place,
 };

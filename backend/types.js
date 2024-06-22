@@ -11,7 +11,20 @@ const registerSchema = zod.object({
   fullname: zod.string({ msg: "fullname is required" }).min(1),
 });
 
+const placesSchema = zod.object({
+  title: zod.string(),
+  address: zod.string(),
+  addedPhotos: zod.array(zod.string()),
+  description: zod.string(),
+  perks: zod.array(zod.string()),
+  extraInfo: zod.string(),
+  checkIn: zod.number(),
+  checkout: zod.number(),
+  maxGuests: zod.number(),
+});
+
 module.exports = {
   loginSchema,
   registerSchema,
+  placesSchema,
 };
