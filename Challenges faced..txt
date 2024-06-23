@@ -1,0 +1,9 @@
+Challenges Faced.
+
+1.UserLogin Context.
+2.PhotoUpload via link.
+3.PhotoUpload via local device.
+4.Checkbox properties.
+5.Redirection
+6.Delete photos
+7.Star functionality

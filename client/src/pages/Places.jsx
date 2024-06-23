@@ -6,6 +6,7 @@ import axios from "axios";
 const Places = () => {
   const { action } = useParams();
   const [userPlaces, setUserPlaces] = useState([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     axios
@@ -19,12 +20,12 @@ const Places = () => {
         setUserPlaces(response.data.userData);
         console.log(userPlaces);
       });
-  }, [userPlaces]);
+  }, [ready]);
 
   console.log(action);
   return (
     <div>
-      {action !== "new" && (
+      {action !== "new" && action !== "edit" && (
         <div className="text-center mt-5 flex flex-col items-center justify-center mx-9">
           <Link
             to="/account/places/new"
@@ -50,13 +51,16 @@ const Places = () => {
           </Link>
           <div className="w-full flex flex-col gap-4 my-4  grow ">
             {userPlaces.map((place, index) => (
-              <div
+              <Link
+                to={`/account/places/edit/${place._id}`}
                 key={index}
                 className=" bg-white py-2 px-4 flex gap-4 items-center rounded-3xl w-full h-[180px] lg:max-w-[1000px] m-auto  "
               >
                 <div className="w-[9rem] h-[9rem] shrink-0 bg-gray-200 rounded-2xl">
                   <img
-                    src={"http://localhost:3000/uploads/" + place.addedPhotos}
+                    src={
+                      "http://localhost:3000/uploads/" + place.addedPhotos[0]
+                    }
                     alt="photo"
                     className="object-cover w-full h-full rounded-2xl"
                   />
@@ -66,12 +70,13 @@ const Places = () => {
                   <p className="text-gray-500 text-sm">{place.description}</p>
                   <p className="text-gray-900 text-md">{place.address}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       )}
-      {action === "new" && <PlacesForm />}
+      {action === "new" && <PlacesForm setReady={setReady} />}
+      {action === "edit" && <PlacesForm setReady={setReady} />}
     </div>
   );
 };

@@ -123,46 +123,60 @@ app.post("/upload", photoMiddleware.array("photos", 100), (req, res) => {
   res.json(uploadedFiles);
 });
 
-app.post("/places", verifyToken, async (req, res) => {
+app.post("/places/:id?", verifyToken, async (req, res) => {
+  console.log("----------------------------" + req.params.id);
+  if (!req.params.id) {
+    const payload = req.body;
+    const parsedPayload = placesSchema.safeParse(payload);
+
+    if (parsedPayload.success) {
+      const {
+        title,
+        address,
+        addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkout,
+        maxGuests,
+      } = parsedPayload.data;
+
+      const newPlace = {
+        title,
+        address,
+        addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkout,
+        maxGuests,
+        owner: req.id,
+      };
+      const data = await Place.create(newPlace);
+      console.log("------------------------------");
+      console.log(data);
+      res.json({ msg: "places added" });
+    } else {
+      res.json({ msg: "places not added" });
+    }
+  } else {
+    const placeData = await Place.findOne({ _id: req.params.id });
+    console.log(placeData);
+    res.json({ placeData: placeData });
+  }
+});
+
+app.put("/places/:id", verifyToken, async (req, res) => {
   const payload = req.body;
-
-  console.log(payload);
-
   const parsedPayload = placesSchema.safeParse(payload);
 
-  console.log(parsedPayload);
-
   if (parsedPayload.success) {
-    const {
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkout,
-      maxGuests,
-    } = parsedPayload.data;
-
-    const newPlace = {
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkout,
-      maxGuests,
-      owner: req.id,
-    };
-    const data = await Place.create(newPlace);
-    console.log("------------------------------");
-    console.log(data);
-    res.json({ msg: "places added" });
+    await Place.updateOne({ _id: req.params.id }, parsedPayload.data);
+    res.json({ msg: "places updated" });
   } else {
-    res.json({ msg: "places not added" });
+    res.json({ msg: "places not updated" });
   }
 });
 
@@ -170,6 +184,11 @@ app.get("/userPlacesData", verifyToken, async (req, res) => {
   console.log(req.id);
   const data = await Place.find({ owner: req.id });
   res.json({ userData: data });
+});
+
+app.get("/data", async (req, res) => {
+  const placesData = await Place.find();
+  res.json({ placesData });
 });
 
 app.listen(3000, () => {
