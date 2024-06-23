@@ -1,10 +1,13 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PhotoUploader from "./PhotoUploader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const PlacesForm = () => {
+const PlacesForm = ({ setReady }) => {
   const navigate = useNavigate();
+
+  const { id } = useParams();
+  console.log("-------------------" + id);
 
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
@@ -17,30 +20,93 @@ const PlacesForm = () => {
   const [addedPhotos, setAddedPhotos] = useState([]);
   const [link, setLink] = useState("");
 
+  useEffect(() => {
+    if (id) {
+      axios
+        .post(
+          `/places/${id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(
+            "The response from the server is -------------------",
+            response.data
+          );
+          console.log(
+            "-------------------------------$$$$$$",
+            response.data.placeData
+          );
+
+          setTitle(response.data.placeData.title);
+          setAddress(response.data.placeData.address);
+          setAddedPhotos(response.data.placeData.addedPhotos);
+          setDescription(response.data.placeData.description);
+          setPerks(response.data.placeData.perks);
+          setExtraInfo(response.data.placeData.extraInfo);
+          setCheckIn(response.data.placeData.checkIn);
+          setCheckout(response.data.placeData.checkout);
+          setMaxGuests(response.data.placeData.maxGuests);
+        });
+    } else {
+      return;
+    }
+  }, [id]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios.post(
-      "/places",
-      {
-        title,
-        address,
-        addedPhotos,
-        description,
-        perks,
-        extraInfo,
-        checkIn: parseInt(checkIn, 10),
-        checkout: parseInt(checkout, 10),
-        maxGuests: parseInt(maxGuests, 10),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+    if (id) {
+      await axios.put(
+        `/places/${id}`,
+        {
+          title,
+          address,
+          addedPhotos,
+          description,
+          perks,
+          extraInfo,
+          checkIn: parseInt(checkIn, 10),
+          checkout: parseInt(checkout, 10),
+          maxGuests: parseInt(maxGuests, 10),
         },
-      }
-    );
-    alert("Place created!");
-    navigate("/account/places");
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      alert("Place updated!");
+      setReady((prev) => !prev);
+      navigate("/account/places");
+    } else {
+      await axios.post(
+        "/places",
+        {
+          title,
+          address,
+          addedPhotos,
+          description,
+          perks,
+          extraInfo,
+          checkIn: parseInt(checkIn, 10),
+          checkout: parseInt(checkout, 10),
+          maxGuests: parseInt(maxGuests, 10),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      alert("Place created!");
+      setReady((prev) => !prev);
+      navigate("/account/places");
+    }
   };
 
   function handlePerks(e) {
@@ -64,6 +130,7 @@ const PlacesForm = () => {
           <input
             className="pt-1 pb-2 rounded-3xl text-xl px-4 shadow-sm"
             type="text"
+            value={title}
             name="title"
             id="title"
             placeholder="Enter the title for the place."
@@ -79,6 +146,7 @@ const PlacesForm = () => {
             className="pt-1 pb-2 rounded-3xl text-xl px-4 shadow-sm"
             type="text"
             name="address"
+            value={address}
             id="address"
             placeholder="Enter the Address of the place."
             onChange={(e) => setAddress(e.target.value)}
@@ -100,6 +168,7 @@ const PlacesForm = () => {
               className="pt-1 pb-2 rounded-3xl text-xl px-4 w-full h-[200px] shadow-sm"
               type="text"
               name="description"
+              value={description}
               id="description"
               placeholder="Enter the Description of the place."
               onChange={(e) => setDescription(e.target.value)}
@@ -116,7 +185,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="wifi" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("wifi")}
+                  name="wifi"
+                  value="wifi"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -138,7 +213,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="parking" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("parking")}
+                  name="parking"
+                  value="parking"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -160,7 +241,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="entrance" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("entrance")}
+                  name="entrance"
+                  value="entrance"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -182,7 +269,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="tv" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("tv")}
+                  name="tv"
+                  value="tv"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -204,7 +297,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="kitchen" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("kitchen")}
+                  name="kitchen"
+                  value="kitchen"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -226,7 +325,13 @@ const PlacesForm = () => {
                   "bg-white flex items-center gap-2 px-2 w-full h-[50px]"
                 }
               >
-                <input type="checkbox" name="pets" onChange={handlePerks} />
+                <input
+                  type="checkbox"
+                  checked={perks.includes("pets")}
+                  name="pets"
+                  value="pets"
+                  onChange={handlePerks}
+                />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -256,6 +361,7 @@ const PlacesForm = () => {
                     type="text"
                     name="checkin"
                     id="checkin"
+                    value={checkIn}
                     placeholder="18:00"
                     onChange={(e) => setCheckIn(e.target.value)}
                     required
@@ -268,6 +374,7 @@ const PlacesForm = () => {
                     type="text"
                     name="checkout"
                     id="checkout"
+                    value={checkout}
                     placeholder="9:00"
                     onChange={(e) => setCheckout(e.target.value)}
                     required
@@ -281,6 +388,7 @@ const PlacesForm = () => {
                     name="guestsno"
                     id="guestsno"
                     placeholder="2"
+                    value={maxGuests}
                     onChange={(e) => setMaxGuests(e.target.value)}
                     required
                   />
@@ -294,6 +402,7 @@ const PlacesForm = () => {
                 type="text"
                 name="extra"
                 id="extra"
+                value={extraInfo}
                 placeholder="Enter the extra information here"
                 onChange={(e) => setExtraInfo(e.target.value)}
                 required
