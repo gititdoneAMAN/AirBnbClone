@@ -191,6 +191,12 @@ app.get("/data", async (req, res) => {
   res.json({ placesData });
 });
 
+app.get("/listedPlace/:id", async (req, res) => {
+  const response = await Place.findOne({ _id: req.params.id });
+  console.log(response);
+  res.json({ listedPlace: response });
+});
+
 app.listen(3000, () => {
   console.log("server is running on port 3000");
 });
