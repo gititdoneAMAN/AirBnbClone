@@ -8,6 +8,7 @@ import axios from "axios";
 import UserContextProvider from "./UserContext";
 import Account from "./pages/Account";
 import ListedPage from "./pages/ListedPage";
+import ViewImage from "./pages/ViewImage";
 
 axios.defaults.baseURL = "http://localhost:3000";
 
@@ -23,6 +24,8 @@ function App() {
           <Route path="/account/:subPage?" element={<Account />} />
           <Route path="/account/:subPage/:action/:id?" element={<Account />} />
           {/* <Route path="/account/places/:id" element={<Account />} /> */}
+          <Route path="/places/:id" element={<ListedPage />} />
+          <Route path="/places/view/:data" element={<ViewImage />} />
         </Routes>
       </UserContextProvider>
     </div>

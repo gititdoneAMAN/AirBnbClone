@@ -1,8 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [value, setValue] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("/data").then((response) => {
@@ -16,7 +18,10 @@ const Home = () => {
       <div className="grid grid-cols-3 gap-3 bg-b ">
         {value.map((item, index) => {
           return (
-            <div className="h-[400px] bg-white rounded-2xl p-2">
+            <div
+              onClick={() => navigate(`/places/${item._id}`)}
+              className="h-[400px] cursor-pointer bg-white rounded-2xl p-2"
+            >
               <div className="w-full h-[325px]">
                 <img
                   src={"http://localhost:3000/uploads/" + item.addedPhotos[0]}
