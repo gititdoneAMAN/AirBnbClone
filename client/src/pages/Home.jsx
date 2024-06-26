@@ -20,7 +20,7 @@ const Home = () => {
           return (
             <div
               onClick={() => navigate(`/places/${item._id}`)}
-              className="h-[400px] cursor-pointer bg-white rounded-2xl p-2"
+              className="h-[425px] cursor-pointer bg-white rounded-2xl p-2"
             >
               <div className="w-full h-[325px]">
                 <img
@@ -31,6 +31,10 @@ const Home = () => {
               </div>
               <h2 className="text-xl font-medium mt-1">{item.title}</h2>
               <p className="text-gray-500">{item.address}</p>
+              <p className="text-red-500 font-bold flex gap-1 text-lg">
+                {`$ ${item.price}`}
+                <span className="text-red-500 font-semibold">per night.</span>
+              </p>
             </div>
           );
         })}

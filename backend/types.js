@@ -21,10 +21,23 @@ const placesSchema = zod.object({
   checkIn: zod.number(),
   checkout: zod.number(),
   maxGuests: zod.number(),
+  price: zod.number(),
+});
+
+const bookingSchema = zod.object({
+  // checkIn: zod.string(),
+  // checkOut: zod.string(),
+  // numGuests: zod.string(),
+  // userName: zod.string(),
+  // email: zod.string().email(),
+  // phone: zod.string(),
+  // price: zod.number(),
+  checkIn: zod.numb,
 });
 
 module.exports = {
   loginSchema,
   registerSchema,
   placesSchema,
+  bookingSchema,
 };

@@ -1,7 +1,12 @@
 const express = require("express");
-const { loginSchema, registerSchema, placesSchema } = require("./types");
+const {
+  loginSchema,
+  registerSchema,
+  placesSchema,
+  bookingSchema,
+} = require("./types");
 const cors = require("cors");
-const { User, Place } = require("./db");
+const { User, Place, Booking } = require("./db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const download = require("image-downloader");
@@ -195,6 +200,42 @@ app.get("/listedPlace/:id", async (req, res) => {
   const response = await Place.findOne({ _id: req.params.id });
   console.log(response);
   res.json({ listedPlace: response });
+});
+
+app.post("/bookings/:id", verifyToken, async (req, res) => {
+  const response = await Place.findOne({ _id: req.params.id });
+
+  if (!response) {
+    res.json({ msg: "Invalid Booking for places" });
+  } else {
+    const payload = req.body;
+
+    console.log(payload);
+
+    // const parsedPayload = bookingSchema.safeParse(payload);
+
+    // console.log("111111111111111111111111111111");
+    // console.log(parsedPayload);
+
+    if (payload) {
+      const { checkIn, checkOut, numGuests, userName, email, phone, price } =
+        payload;
+
+      await Booking.create({
+        place: req.params.id,
+        checkIn,
+        checkOut,
+        numGuests,
+        userName,
+        email,
+        phone,
+        price,
+      });
+      res.json({ msg: "booking success" });
+    } else {
+      res.json({ msg: "Error occured" });
+    }
+  }
 });
 
 app.listen(3000, () => {

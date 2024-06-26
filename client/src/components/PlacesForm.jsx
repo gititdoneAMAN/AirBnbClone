@@ -19,6 +19,7 @@ const PlacesForm = ({ setReady }) => {
   const [maxGuests, setMaxGuests] = useState(1);
   const [addedPhotos, setAddedPhotos] = useState([]);
   const [link, setLink] = useState("");
+  const [price, setPrice] = useState(100);
 
   useEffect(() => {
     if (id) {
@@ -51,6 +52,7 @@ const PlacesForm = ({ setReady }) => {
           setCheckIn(response.data.placeData.checkIn);
           setCheckout(response.data.placeData.checkout);
           setMaxGuests(response.data.placeData.maxGuests);
+          setPrice(response.data.placeData.price);
         });
     } else {
       return;
@@ -73,6 +75,7 @@ const PlacesForm = ({ setReady }) => {
           checkIn: parseInt(checkIn, 10),
           checkout: parseInt(checkout, 10),
           maxGuests: parseInt(maxGuests, 10),
+          price: parseInt(price, 10),
         },
         {
           headers: {
@@ -96,6 +99,7 @@ const PlacesForm = ({ setReady }) => {
           checkIn: parseInt(checkIn, 10),
           checkout: parseInt(checkout, 10),
           maxGuests: parseInt(maxGuests, 10),
+          price: parseInt(price, 10),
         },
         {
           headers: {
@@ -353,7 +357,7 @@ const PlacesForm = ({ setReady }) => {
               <label className="text-[24px] mt-2 " htmlFor="description">
                 Checkin And CheckOut
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 <label className="text-[16px] flex flex-col ">
                   Checkin
                   <input
@@ -390,6 +394,19 @@ const PlacesForm = ({ setReady }) => {
                     placeholder="2"
                     value={maxGuests}
                     onChange={(e) => setMaxGuests(e.target.value)}
+                    required
+                  />
+                </label>
+                <label className="text-[16px] flex flex-col ">
+                  Price
+                  <input
+                    className="pt-1 pb-2 rounded-3xl text-xl px-4 shadow-sm"
+                    type="text"
+                    name="price"
+                    id="price"
+                    placeholder="$ 250"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
                     required
                   />
                 </label>

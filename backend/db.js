@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bookingDetails: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+    },
+  ],
 });
 
 const placeSchema = new mongoose.Schema({
@@ -29,16 +35,49 @@ const placeSchema = new mongoose.Schema({
   checkIn: String,
   checkout: String,
   maxGuests: Number,
+  price: Number,
+  bookingDetails: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+    },
+  ],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
 });
 
+const bookingSchema = mongoose.Schema({
+  checkIn: String,
+  checkOut: String,
+  numGuests: Number,
+  userName: String,
+  email: String,
+  phone: String,
+  price: Number,
+  place: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Place",
+  },
+  rentedDetails: [
+    {
+      renterId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      entryDate: String,
+      exitDate: String,
+    },
+  ],
+});
+
 const User = mongoose.model("User", userSchema);
 const Place = mongoose.model("Place", placeSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
 
 module.exports = {
   User,
   Place,
+  Booking,
 };
