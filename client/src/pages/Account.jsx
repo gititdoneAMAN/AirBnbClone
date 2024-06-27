@@ -3,6 +3,7 @@ import { userContext } from "../UserContext";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Places from "./Places";
+import Bookings from "./Bookings";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -110,6 +111,7 @@ const Account = () => {
         <></>
       )}
       {subPage === "places" ? <Places /> : <></>}
+      {subPage === "bookings" ? <Bookings /> : <></>}
     </div>
   );
 };
