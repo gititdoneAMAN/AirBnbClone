@@ -14,6 +14,8 @@ const multer = require("multer");
 const fs = require("fs");
 
 const { verifyToken } = require("./middleware");
+const { exit, exitCode } = require("process");
+const { default: mongoose } = require("mongoose");
 
 const app = express();
 require("dotenv").config();
@@ -221,17 +223,110 @@ app.post("/bookings/:id", verifyToken, async (req, res) => {
       const { checkIn, checkOut, numGuests, userName, email, phone, price } =
         payload;
 
-      await Booking.create({
-        place: req.params.id,
-        checkIn,
-        checkOut,
-        numGuests,
-        userName,
-        email,
-        phone,
-        price,
-      });
-      res.json({ msg: "booking success" });
+      console.log("---------------", new Date(checkIn));
+
+      // const placeBookingData = await Place.findOne({ _id: req.params.id });
+
+      const bookingDetailsArray = response.bookingDetails.length;
+
+      if (!bookingDetailsArray) {
+        const bookingData = await Booking.create({
+          place: req.params.id,
+          checkIn,
+          checkOut,
+          numGuests,
+          userName,
+          email,
+          phone,
+          price,
+          rentedDetails: [
+            {
+              renterId: req.id,
+              entryDate: checkIn,
+              exitDate: checkOut,
+            },
+          ],
+        });
+
+        await Place.updateOne(
+          { _id: req.params.id },
+          {
+            $push: {
+              bookingDetails: bookingData._id,
+            },
+          }
+        );
+
+        await User.updateOne(
+          { _id: req.id },
+          {
+            $push: {
+              bookingDetails: bookingData._id,
+            },
+          }
+        );
+
+        res.json({ msg: "booking success" });
+      } else {
+        const bookingId = response.bookingDetails[bookingDetailsArray - 1];
+
+        const data = await Booking.findOne({ _id: bookingId });
+
+        console.log("priniting the data", data);
+
+        if (data) {
+          const dataLength = data.rentedDetails.length;
+          checkOutDate =
+            data.rentedDetails.length > 0
+              ? data.rentedDetails[dataLength - 1].exitDate
+              : null;
+
+          console.log("checkOutDate", checkOutDate);
+          console.log("checkOutDateee", new Date(checkOutDate));
+
+          if (new Date(checkIn) <= new Date(checkOutDate)) {
+            res.json({ msg: "Already booked" });
+          } else {
+            const bookingData = await Booking.create({
+              place: req.params.id,
+              checkIn,
+              checkOut,
+              numGuests,
+              userName,
+              email,
+              phone,
+              price,
+              rentedDetails: [
+                {
+                  renterId: req.id,
+                  entryDate: checkIn,
+                  exitDate: checkOut,
+                },
+              ],
+            });
+
+            await Place.updateOne(
+              { _id: req.params.id },
+              {
+                $push: {
+                  bookingDetails: bookingData._id,
+                },
+              }
+            );
+
+            await User.updateOne(
+              { _id: req.id },
+              {
+                $push: {
+                  bookingDetails: bookingData._id,
+                },
+              }
+            );
+
+            res.json({ msg: "booking success" });
+          }
+        }
+      }
     } else {
       res.json({ msg: "Error occured" });
     }
