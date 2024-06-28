@@ -333,6 +333,23 @@ app.post("/bookings/:id", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/bookingDetails", verifyToken, async (req, res) => {
+  const userBookingData = await User.findOne({ _id: req.id });
+
+  const bookingDetailsArray = userBookingData.bookingDetails;
+
+  if (bookingDetailsArray.length == 0) {
+    res.json({ msg: "No bookings found" });
+  } else {
+    const responseArray = [];
+    for (let i = 0; i < bookingDetailsArray.length; i++) {
+      const response = await Booking.findOne({ _id: bookingDetailsArray[i] });
+      responseArray.push(response);
+    }
+    res.json({ bookingDetails: responseArray });
+  }
+});
+
 app.listen(3000, () => {
   console.log("server is running on port 3000");
 });
